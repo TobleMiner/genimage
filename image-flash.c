@@ -120,6 +120,14 @@ static int flash_setup(struct image *image, cfg_t *cfg)
 		} else {
 			part->offset = partsize;
 		}
+		if (part->image) {
+			struct image *child = image_get(part->image);
+			if (child && child->size > part->size) {
+				image_error(image, "part %s size (%lld) too small for %s (%lld)\n",
+						part->name, part->size, child->file, child->size);
+				return -EINVAL;
+			}
+		}
 
 		partsize = part->offset + part->size;
 	}
